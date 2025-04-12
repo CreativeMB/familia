@@ -1,124 +1,111 @@
 package com.creativem.familia
-
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.auth.FirebaseUser
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.common.api.ApiException
 
 class Login : AppCompatActivity() {
 
-    private lateinit var auth: FirebaseAuth
-    private lateinit var oneTapClient: SignInClient
-    private lateinit var signInRequest: BeginSignInRequest
-    private lateinit var googleButton: Button
+    private lateinit var mAuth: FirebaseAuth
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var mDatabase: DatabaseReference
 
-    // Lanzador para manejar el resultado del selector de cuentas de Google
-    private val googleSignInLauncher = registerForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()
-    ) { result ->
-        try {
-            if (result.resultCode == RESULT_OK) {
-                val credential = oneTapClient.getSignInCredentialFromIntent(result.data)
-                val idToken = credential.googleIdToken
-                if (idToken != null) {
-                    val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-                    auth.signInWithCredential(firebaseCredential)
-                        .addOnCompleteListener(this) { task ->
-                            if (task.isSuccessful) {
-                                Log.d("Login", "Inicio de sesión exitoso")
-                                startActivity(Intent(this, MainActivity::class.java))
-                                finish()
-                            } else {
-                                Log.e("Login", "Error al autenticar con Firebase: ${task.exception?.message}")
-                                Toast.makeText(
-                                    this,
-                                    "Error al iniciar sesión: ${task.exception?.message}",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-                } else {
-                    Log.e("Login", "No se pudo obtener el ID Token")
-                    Toast.makeText(this, "No se pudo obtener el ID Token de Google", Toast.LENGTH_LONG).show()
-                }
-            } else {
-                Log.e("Login", "Autenticación con Google cancelada o fallida: ${result.resultCode}")
-                Toast.makeText(this, "Autenticación con Google cancelada", Toast.LENGTH_LONG).show()
-            }
-        } catch (e: Exception) {
-            Log.e("Login", "Error en el proceso de autenticación: ${e.message}", e)
-            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-        }
-    }
+    private val RC_SIGN_IN = 9001 // Request code for Google Sign-In
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // Inicializar Firebase Auth
-        auth = FirebaseAuth.getInstance()
+        mAuth = FirebaseAuth.getInstance()
+        mDatabase = FirebaseDatabase.getInstance().reference
 
-        // Inicializar el botón de Google Sign-In
-        val cardGoogleSignIn = findViewById<CardView>(R.id.cardGoogleSignIn)
-        // Inicializar One-Tap Client
-        oneTapClient = Identity.getSignInClient(this)
-
-        // Configurar la solicitud de inicio de sesión con Google
-        signInRequest = BeginSignInRequest.builder()
-            .setGoogleIdTokenRequestOptions(
-                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
-                    .setServerClientId(getString(R.string.default_web_client_id))
-                    .setFilterByAuthorizedAccounts(false) // Mostrar todas las cuentas
-                    .build()
-            )
-            .setAutoSelectEnabled(false) // Evitar selección automática
+        // Configura el cliente de Google Sign-In
+        val googleSignInOptions = com.google.android.gms.auth.api.signin.GoogleSignInOptions
+            .Builder(com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id)) // Obtén tu ID de cliente web desde Firebase
+            .requestEmail()
             .build()
-        cardGoogleSignIn.setOnClickListener {
-            // Aquí va la lógica para iniciar sesión con Google
-            Toast.makeText(this, "Iniciando sesión con Google...", Toast.LENGTH_SHORT).show()
 
-            // Por ejemplo:
-            startGoogleSignIn()
+        mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
+
+        // Asegúrate de que cardViewinicio es un CardView en el XML
+        val signInCard = findViewById<CardView>(R.id.cardGoogleSignIn)
+
+        signInCard.setOnClickListener {
+            signInWithGoogle()
         }
     }
 
+    private fun signInWithGoogle() {
+        val signInIntent = mGoogleSignInClient.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
 
-    private fun startGoogleSignIn() {
-        oneTapClient.beginSignIn(signInRequest)
-            .addOnSuccessListener { result ->
-                try {
-                    googleSignInLauncher.launch(
-                        androidx.activity.result.IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
-                    )
-                } catch (e: Exception) {
-                    Log.e("Login", "Error al lanzar el selector de cuentas: ${e.message}", e)
-                    Toast.makeText(this, "Error al abrir el selector: ${e.message}", Toast.LENGTH_LONG).show()
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            handleSignInResult(task)
+        }
+    }
+
+    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+        try {
+            val account = completedTask.getResult(ApiException::class.java)
+            firebaseAuthWithGoogle(account!!)
+        } catch (e: ApiException) {
+            Toast.makeText(this, "Error al autenticar con Google: ${e.message}", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        mAuth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Inicio de sesión exitoso
+                    val user = mAuth.currentUser
+                    if (user != null) {
+                        checkUserProfile(user)
+                    }
+                } else {
+                    Toast.makeText(this, "Autenticación fallida", Toast.LENGTH_SHORT).show()
                 }
             }
-            .addOnFailureListener { exception ->
-                Log.e("Login", "Fallo al iniciar sesión con Google: ${exception.message}", exception)
-                Toast.makeText(this, "No se pudo iniciar sesión: ${exception.message}", Toast.LENGTH_LONG).show()
-            }
     }
 
-    override fun onStart() {
-        super.onStart()
-        // Verificar si el usuario ya está autenticado
-        if (auth.currentUser != null) {
-            Log.d("Login", "Usuario ya autenticado, redirigiendo a MainActivity")
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
+    private fun checkUserProfile(user: FirebaseUser) {
+        // Verifica si el perfil del usuario ya está creado en la base de datos
+        val userRef = mDatabase.child("usuarios").child(user.uid)
+        userRef.get().addOnSuccessListener {
+            if (it.exists()) {
+                // Si el perfil ya existe, redirige a la página de pedidos
+                navigateToOrders()
+            } else {
+
+            }
         }
+    }
+
+
+
+    private fun navigateToOrders() {
+        // Redirige al usuario a la página de pedidos
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish() // Finaliza la actividad actual
     }
 }
