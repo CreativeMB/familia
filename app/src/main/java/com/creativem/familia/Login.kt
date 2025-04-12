@@ -88,17 +88,24 @@ class Login : AppCompatActivity() {
     }
 
     private fun checkUserProfile(user: FirebaseUser) {
-        // Verifica si el perfil del usuario ya está creado en la base de datos
         val userRef = mDatabase.child("usuarios").child(user.uid)
         userRef.get().addOnSuccessListener {
             if (it.exists()) {
-                // Si el perfil ya existe, redirige a la página de pedidos
+                // Ya existe, ir a MainActivity
                 navigateToOrders()
             } else {
+                // Registrar en base de datos con FirebaseHelper
+                val nombre = user.displayName ?: "Sin nombre"
+                val helper = FirebaseHelper()
+                helper.registrarUsuarioSiNoExiste(nombre)
 
+                navigateToOrders()
             }
+        }.addOnFailureListener {
+            Toast.makeText(this, "Error al verificar perfil: ${it.message}", Toast.LENGTH_SHORT).show()
         }
     }
+
 
 
 
