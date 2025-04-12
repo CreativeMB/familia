@@ -281,8 +281,6 @@ class MainActivity : AppCompatActivity() {
         usuariosSnapshot: DataSnapshot? = null,
         gastosSnapshot: DataSnapshot? = null
     ) {
-        val mesActual = obtenerMesActualConAnio()
-
         // Cache para evitar que se reinicien los datos cuando llegan asincrónicamente
         if (usuariosSnapshot != null) cacheUsuariosSnapshot = usuariosSnapshot
         if (gastosSnapshot != null) cacheGastosSnapshot = gastosSnapshot
@@ -294,11 +292,21 @@ class MainActivity : AppCompatActivity() {
             var totalAportes = 0
             var totalGastos = 0
 
+            // Recorre todos los usuarios y todos los meses dentro de cada uno
             for (userSnapshot in usuarios.children) {
-                val aporte = userSnapshot.child(mesActual).getValue(Int::class.java)
-                if (aporte != null) totalAportes += aporte
+                for (campoSnapshot in userSnapshot.children) {
+                    val clave = campoSnapshot.key ?: ""
+                    if (clave.contains("_")) { // Asumimos que los aportes se llaman como "abril_2025"
+                        val aporte = campoSnapshot.getValue(Int::class.java)
+                        if (aporte != null) {
+                            totalAportes += aporte
+                        }
+                    }
+                }
             }
 
+
+            // Recorre todos los gastos
             for (gastoSnapshot in gastos.children) {
                 val valor = gastoSnapshot.child("valor").getValue(Int::class.java)
                 if (valor != null) totalGastos += valor
@@ -312,6 +320,7 @@ class MainActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.textDiferencia).text = "Saldo $${diferencia}"
         }
     }
+
 
 
     private fun escucharCambiosEnTotales() {
