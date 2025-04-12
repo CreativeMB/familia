@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1092521891105",
+    "firebase_url": "https://familia-38ca0-default-rtdb.firebaseio.com",
+    "project_id": "familia-38ca0",
+    "storage_bucket": "familia-38ca0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092521891105:android:19d06439e4563e38851a60",
+        "android_client_info": {
+          "package_name": "com.creativem.familia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1092521891105-10rmfu2vcuh5cq399kcgcihekjrsqvct.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.creativem.familia",
+            "certificate_hash": "a02bb325cd3103bc565ed28b50feafd1a814f2cd"
+          }
+        },
+        {
+          "client_id": "1092521891105-rm0l9bro5qfm0qmvgi88fka0g6crgdt4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmX1DLl96tTPaJXVKj3pxFpiBOv46QD_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1092521891105-rm0l9bro5qfm0qmvgi88fka0g6crgdt4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
