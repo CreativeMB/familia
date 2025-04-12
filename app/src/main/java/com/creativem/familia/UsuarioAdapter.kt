@@ -27,10 +27,10 @@ class UsuarioAdapter(private val usuarios: List<Usuario>) :
         val cuotaDelMes = u.cuotas[mesActual] // Buscar la cuota para el mes actual
 
         if (cuotaDelMes != null) {
-            holder.cuotaText.text = "Cuota de $mesActual: $cuotaDelMes"
+            holder.cuotaText.text = "$mesActual: $$cuotaDelMes"
             holder.cuotaText.setTextColor(holder.itemView.context.getColor(android.R.color.holo_green_dark))
         } else {
-            holder.cuotaText.text = "Cuota de $mesActual: No asignada"
+            holder.cuotaText.text = "$mesActual: Sin Aporte"
             holder.cuotaText.setTextColor(holder.itemView.context.getColor(android.R.color.holo_red_dark))
         }
     }

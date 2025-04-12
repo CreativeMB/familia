@@ -38,8 +38,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gastosAdapter: GastoAdapter
     private val listaGastos = mutableListOf<Gasto>()
 
-    private val correoAdministrador = "jhonalexandermr1@gmail.com"
-
+    private val correoAdministrador = "luzcelyrg@gmail.com"
 
     private val db: DatabaseReference = FirebaseDatabase.getInstance().reference
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -308,9 +307,9 @@ class MainActivity : AppCompatActivity() {
             val diferencia = totalAportes - totalGastos
 
             // Actualiza los TextViews
-            findViewById<TextView>(R.id.textTotalAportes).text = "Total Aportes: $${totalAportes}"
-            findViewById<TextView>(R.id.textTotalGastos).text = "Total Gastos: $${totalGastos}"
-            findViewById<TextView>(R.id.textDiferencia).text = "Diferencia: $${diferencia}"
+            findViewById<TextView>(R.id.textTotalAportes).text = "Aportes $${totalAportes}"
+            findViewById<TextView>(R.id.textTotalGastos).text = "Gastos $${totalGastos}"
+            findViewById<TextView>(R.id.textDiferencia).text = "Saldo $${diferencia}"
         }
     }
 

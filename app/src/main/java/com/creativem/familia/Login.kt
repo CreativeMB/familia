@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -67,8 +68,7 @@ class Login : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
 
         // Inicializar el botón de Google Sign-In
-        googleButton = findViewById(R.id.buttonGoogleSignIn)
-
+        val cardGoogleSignIn = findViewById<CardView>(R.id.cardGoogleSignIn)
         // Inicializar One-Tap Client
         oneTapClient = Identity.getSignInClient(this)
 
@@ -83,12 +83,16 @@ class Login : AppCompatActivity() {
             )
             .setAutoSelectEnabled(false) // Evitar selección automática
             .build()
+        cardGoogleSignIn.setOnClickListener {
+            // Aquí va la lógica para iniciar sesión con Google
+            Toast.makeText(this, "Iniciando sesión con Google...", Toast.LENGTH_SHORT).show()
 
-        // Configurar el listener del botón
-        googleButton.setOnClickListener {
+            // Por ejemplo:
             startGoogleSignIn()
         }
     }
+
+
 
     private fun startGoogleSignIn() {
         oneTapClient.beginSignIn(signInRequest)

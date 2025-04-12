@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Colores que transmiten alegría y positividad -->
+    <color name="sunny_yellow">#FFEB3B</color>     <!-- Amarillo soleado, energía -->
+    <color name="coral_orange">#FF8A65</color>     <!-- Naranja coral, entusiasmo -->
+    <color name="peach_pink">#FFCDD2</color>       <!-- Rosa suave, ternura y amor -->
+    <color name="sky_blue">#81D4FA</color>         <!-- Azul cielo, tranquilidad y optimismo -->
+    <color name="mint_green">#A5D6A7</color>       <!-- Verde menta, frescura y esperanza -->
+    <color name="lavender">#7E7E7E</color>         <!-- Lavanda, calma y dulzura -->
+
+    <!-- Neutros suaves para balance -->
+    <color name="warm_white">#FFFDE7</color>       <!-- Blanco cálido para fondos -->
+    <color name="rich_brown">#6D4C41</color>       <!-- Marrón elegante para texto -->
+
+    <!-- Para fondo y acentos -->
+    <color name="light_background">#FFF8E1</color> <!-- Fondo claro y cálido -->
+    <color name="vibrant_accent">#FF7043</color>   <!-- Acento energético -->
 </resources>

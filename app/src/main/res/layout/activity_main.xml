@@ -4,76 +4,75 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/lavender"
+    android:padding="10dp"
+    android:layout_marginTop="30dp"
+    android:layout_marginBottom="30dp">
 
     <!-- RecyclerView de Usuarios -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Usuarios"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:layout_marginBottom="8dp" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewUsuarios"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:background="@color/lavender"
+        android:layout_weight="2"
         tools:listitem="@layout/item_usuario" />
 
-    <!-- RecyclerView de Gastos -->
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/layoutTotales"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Gastos"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="8dp" />
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:padding="12dp"
+        android:background="#C3085049"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/textTotalAportes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Aporte: $0"
+            android:textColor="@color/light_background"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/textTotalGastos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Gasto: $0"
+            android:textStyle="bold"
+            android:textColor="@color/light_background"
+            android:textSize="20sp"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/textDiferencia"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Saldo: $0"
+            android:textStyle="bold"
+            android:textColor="@color/light_background"
+            android:textSize="20sp"
+            android:gravity="center"/>
+    </LinearLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerGastos"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@color/lavender"
         tools:listitem="@layout/item_gasto" />
-    <!-- Totales -->
-    <LinearLayout
-        android:id="@+id/layoutTotales"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp"
-        android:padding="8dp"
-        android:background="#EFEFEF">
 
-        <TextView
-            android:id="@+id/textTotalAportes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Total Aportes: $0"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp" />
-
-        <TextView
-            android:id="@+id/textTotalGastos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Total Gastos: $0"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp" />
-
-        <TextView
-            android:id="@+id/textDiferencia"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Diferencia: $0"
-            android:textStyle="bold"
-            android:textSize="16sp" />
-    </LinearLayout>
 
 
     <!-- Botones -->
@@ -89,13 +88,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Agregar Aporte"
-            android:layout_marginEnd="16dp" />
+            android:textColor="@color/lavender"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="10dp"/>
 
         <Button
             android:id="@+id/buttonAsignarGasto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Agregar Gasto" />
+            android:textColor="@color/lavender"
+            android:text="Agregar Gasto"
+            android:layout_marginBottom="10dp"/>
     </LinearLayout>
 
 </LinearLayout>
