@@ -21,7 +21,7 @@ class UsuarioAdapter(private val usuarios: List<Usuario>) :
     override fun onBindViewHolder(holder: UsuarioViewHolder, position: Int) {
         val u = usuarios[position]
         holder.nombreText.text = u.nombre
-        holder.correoText.text = u.correo
+//        holder.correoText.text = u.correo
 
         val mesActual = obtenerMesActualConAnio()  // Obtener el mes y año actual
         val cuotaDelMes = u.cuotas[mesActual] // Buscar la cuota para el mes actual
@@ -48,7 +48,7 @@ class UsuarioAdapter(private val usuarios: List<Usuario>) :
 
     class UsuarioViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nombreText: TextView = itemView.findViewById(R.id.nombreText)
-        val correoText: TextView = itemView.findViewById(R.id.correoText)
+//        val correoText: TextView = itemView.findViewById(R.id.correoText)
         val cuotaText: TextView = itemView.findViewById(R.id.cuotaText)
     }
 
