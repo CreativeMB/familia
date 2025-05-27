@@ -3,135 +3,133 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="@color/lavender">
 
-    <!-- RecyclerView de Usuarios -->
-    <!-- CONTENIDO PRINCIPAL DENTRO DE UN LINEAR -->
+    <!-- Contenedor principal vertical -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="10dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp">
+        android:padding="10dp">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewUsuarios"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/lavender"
-        android:layout_weight="2"
-        tools:listitem="@layout/item_usuario" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="4dp"
-        android:background="#C3085049">
-
-        <!-- TÍTULO dentro del mismo fondo -->
-        <TextView
-            android:id="@+id/textTituloTotales"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Totales Genenerales"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/light_background"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- FILA DE TOTALES -->
-        <LinearLayout
-            android:id="@+id/layoutTotales"
+        <!-- RecyclerView de Usuarios (solo lo que necesiten los usuarios registrados) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewUsuarios"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:background="@color/lavender"
+            tools:listitem="@layout/item_usuario" />
+
+        <!-- Totales -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="4dp"
+            android:background="#C3085049">
 
             <TextView
-                android:id="@+id/tvTotalCuotas"
-                android:layout_width="0dp"
+                android:id="@+id/textTituloTotales"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Aporte: $0"
-                android:textColor="@color/light_background"
-                android:textStyle="bold"
+                android:text="Totales Generales"
                 android:textSize="16sp"
-                android:gravity="center"/>
-
-            <TextView
-                android:id="@+id/tvTotalGastos"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Gasto: $0"
-                android:textStyle="bold"
-                android:textColor="#FD837A"
-                android:textSize="16sp"
-                android:gravity="center"/>
-
-            <TextView
-                android:id="@+id/tvSaldoFinal"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Saldo: $0"
                 android:textStyle="bold"
                 android:textColor="@color/light_background"
-                android:textSize="16sp"
-                android:gravity="center"/>
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/layoutTotales"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tvTotalCuotas"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Aporte: $0"
+                    android:textColor="@color/light_background"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/tvTotalGastos"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Gasto: $0"
+                    android:textStyle="bold"
+                    android:textColor="#FD837A"
+                    android:textSize="16sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/tvSaldoFinal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Saldo: $0"
+                    android:textStyle="bold"
+                    android:textColor="@color/light_background"
+                    android:textSize="16sp"
+                    android:gravity="center" />
+            </LinearLayout>
         </LinearLayout>
+
+        <!-- RecyclerView de Gastos (ocupa el resto del espacio) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerGastos"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/lavender"
+            tools:listitem="@layout/item_gasto" />
     </LinearLayout>
 
-
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerGastos"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/lavender"
-        tools:listitem="@layout/item_gasto" />
-
-
-
-    <!-- Botones -->
+    <!-- Botones flotantes en línea horizontal en la parte inferior -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginTop="12dp">
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:gravity="center_horizontal">
 
-        <Button
-            android:id="@+id/buttonAsignarCuota"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Agregar Aporte"
-            android:textColor="@color/lavender"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="10dp"/>
-
-        <Button
+        <ImageView
             android:id="@+id/buttonAsignarGasto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/lavender"
-            android:text="Agregar Gasto"
-            android:layout_marginBottom="10dp"/>
-    </LinearLayout>
-    </LinearLayout>
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/baseline_archive_24"
+            android:contentDescription="Asignar Gasto"
+            android:elevation="8dp"
+            android:padding="12dp" />
+
+        <ImageView
+            android:id="@+id/buttonAsignarCuota"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/baseline_add_to_photos_24"
+            android:contentDescription="Asignar Cuota"
+            android:elevation="8dp"
+            android:padding="12dp" />
+
         <ImageView
             android:id="@+id/btnExportarPDF"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/baseline_drive_file_move_24"
             android:contentDescription="Exportar PDF"
-            android:background="@drawable/icono"
-            android:padding="12dp"
-            android:elevation="8dp"/>
+            android:elevation="8dp"
+            android:padding="12dp" />
+    </LinearLayout>
+
 
 </FrameLayout>

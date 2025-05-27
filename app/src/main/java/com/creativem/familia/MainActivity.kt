@@ -72,11 +72,12 @@ class MainActivity : AppCompatActivity() {
         val auth = FirebaseAuth.getInstance()
         val usuarioActual = auth.currentUser
 
-        val buttonAsignarCuota = findViewById<Button>(R.id.buttonAsignarCuota)
+        val buttonAsignarCuota = findViewById<ImageView>(R.id.buttonAsignarCuota)
         buttonAsignarCuota.setOnClickListener {
             mostrarDialogoAsignarCuota()
         }
-        val buttonAsignarGasto = findViewById<Button>(R.id.buttonAsignarGasto)
+
+        val buttonAsignarGasto = findViewById<ImageView>(R.id.buttonAsignarGasto)
         buttonAsignarGasto.setOnClickListener {
             mostrarDialogoAgregarGasto()
         }
@@ -303,9 +304,9 @@ class MainActivity : AppCompatActivity() {
         val tvTotalGastos = findViewById<TextView>(R.id.tvTotalGastos)
         val tvSaldoFinal = findViewById<TextView>(R.id.tvSaldoFinal)
 
-        tvTotalCuotas.text = "Total Cuotas: $totalCuotas"
-        tvTotalGastos.text = "Total Gastos: $totalGastos"
-        tvSaldoFinal.text = "Saldo Final: $saldoFinal"
+        tvTotalCuotas.text = "Aporte: $totalCuotas"
+        tvTotalGastos.text = "Gasto: $totalGastos"
+        tvSaldoFinal.text = "Saldo: $saldoFinal"
     }
 
     private fun escucharCambiosEnTotales() {
@@ -364,7 +365,7 @@ class MainActivity : AppCompatActivity() {
         var y = margin
 
         // --- Título ---
-        canvas.drawText("Reporte de Usuarios, Cuotas y Gastos", margin, y, titlePaint)
+        canvas.drawText("Reporte total, Recaudos y Gastos", margin, y, titlePaint)
         y += 40f
 
         // --- Tabla Usuarios ---
@@ -427,7 +428,7 @@ class MainActivity : AppCompatActivity() {
                 // Columna Cuota
                 canvas.drawRect(x, y, x + colWidthsUsuarios[2], y + rowHeight, borderPaint)
                 val cuota = usuario.cuotas[mes]
-                val cuotaTexto = if (cuota != null && cuota > 0) "$cuota" else "No dio aporte"
+                val cuotaTexto = if (cuota != null && cuota > 0) "$cuota" else "Sin Aporte"
                 canvas.drawText(cuotaTexto, x + 5f, y + 20f, paint)
 
                 y += rowHeight
@@ -508,7 +509,7 @@ class MainActivity : AppCompatActivity() {
         pdfDocument.finishPage(page)
 
         // Guardar y compartir (usa tu método de preferencia)
-        val fileName = "reporte_familia_${System.currentTimeMillis()}.pdf"
+        val fileName = "Reporte${System.currentTimeMillis()}.pdf"
         val file = File(cacheDir, fileName)
 
         try {
