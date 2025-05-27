@@ -334,6 +334,9 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "No hay datos para exportar", Toast.LENGTH_SHORT).show()
             return
         }
+        val totalCuotas = listaUsuarios.sumOf { it.cuotas.values.sum() }
+        val totalGastos = listaGastos.sumOf { it.valor ?: 0 }
+        val saldoFinal = totalCuotas - totalGastos
 
         val pdfDocument = PdfDocument()
         val pageWidth = 595
@@ -503,6 +506,29 @@ class MainActivity : AppCompatActivity() {
 
                 y += rowHeight
             }
+            // --- Espacio antes de totales ---
+            y += 40f
+            if (y + rowHeight * 3 > pageHeight - margin) {
+                pdfDocument.finishPage(page)
+                pageNumber++
+                val newPageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
+                page = pdfDocument.startPage(newPageInfo)
+                canvas = page.canvas
+                y = margin
+            }
+
+// --- Mostrar Totales ---
+            canvas.drawText("Totales Generales", margin, y, titlePaint)
+            y += rowHeight
+
+            canvas.drawText("Total Recaudos: $totalCuotas", margin, y, paint)
+            y += rowHeight
+
+            canvas.drawText("Total Gastos: $totalGastos", margin, y, paint)
+            y += rowHeight
+
+            canvas.drawText("Saldo Final: $saldoFinal", margin, y, paint)
+            y += rowHeight
         }
 
         // Finaliza la última página
