@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.creativem.familia.Modelo.Gasto
 
-class GastoAdapter(private val listaGastos: List<Gasto>) :
+class GastoAdapter(private var listaGastos: List<Gasto>) :
     RecyclerView.Adapter<GastoAdapter.GastoViewHolder>() {
 
     class GastoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -23,10 +23,16 @@ class GastoAdapter(private val listaGastos: List<Gasto>) :
 
     override fun onBindViewHolder(holder: GastoViewHolder, position: Int) {
         val gasto = listaGastos[position]
-        holder.textValor.text = "Valor: $${gasto.valor}"
-        holder.textDetalle.text = "Detalle: ${gasto.detalle}"
+        holder.textValor.text = "Gasto: $${gasto.valor}"
+        holder.textDetalle.text = gasto.detalle
         holder.textFecha.text = "Fecha: ${gasto.fecha}"
     }
 
     override fun getItemCount(): Int = listaGastos.size
+
+    // ✅ Método para actualizar la lista y mostrar los últimos primero
+    fun actualizarLista(nuevaLista: List<Gasto>) {
+        listaGastos = nuevaLista.reversed() // Invertir para que el último aparezca primero
+        notifyDataSetChanged()
+    }
 }

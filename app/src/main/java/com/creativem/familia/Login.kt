@@ -30,18 +30,23 @@ class Login : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         mDatabase = FirebaseDatabase.getInstance().reference
 
+        // Verificar si ya hay un usuario autenticado
+        val currentUser = mAuth.currentUser
+        if (currentUser != null) {
+            checkUserProfile(currentUser) // Ir directamente a la app si ya está logueado
+            return // No seguir cargando la UI de login
+        }
+
         // Configura el cliente de Google Sign-In
         val googleSignInOptions = com.google.android.gms.auth.api.signin.GoogleSignInOptions
             .Builder(com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id)) // Obtén tu ID de cliente web desde Firebase
+            .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
 
-        // Asegúrate de que cardViewinicio es un CardView en el XML
         val signInCard = findViewById<CardView>(R.id.cardGoogleSignIn)
-
         signInCard.setOnClickListener {
             signInWithGoogle()
         }

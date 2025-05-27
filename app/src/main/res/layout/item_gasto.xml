@@ -3,8 +3,8 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    card_view:cardCornerRadius="12dp"
+    android:layout_margin="4dp"
+    card_view:cardCornerRadius="8dp"
     card_view:cardElevation="6dp"
     card_view:cardBackgroundColor="#FAFAFA">
 
@@ -12,36 +12,41 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:padding="4dp"
         android:background="@color/warm_white">
 
-        <TextView
-            android:id="@+id/textValor"
-            android:layout_width="wrap_content"
+        <!-- Fila con Valor a la izquierda y Fecha a la derecha -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Valor"
-            android:textStyle="bold"
-            android:textColor="#d32f2f"
-            android:textSize="20sp"
-            android:lineSpacingExtra="0dp"/>
+            android:orientation="horizontal">
 
+            <TextView
+                android:id="@+id/textValor"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Valor"
+                android:textStyle="bold"
+                android:textColor="#d32f2f"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/textFecha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fecha"
+                android:textSize="16sp"
+                android:textColor="#888888"
+                android:gravity="end" />
+        </LinearLayout>
+
+        <!-- Detalle debajo -->
         <TextView
             android:id="@+id/textDetalle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Detalle"
-            android:textSize="18sp"
-            android:layout_marginTop="2dp"
-            android:lineSpacingExtra="0dp"/>
-
-        <TextView
-            android:id="@+id/textFecha"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Fecha"
-            android:textSize="16sp"
-            android:textColor="#888888"
-            android:layout_marginTop="2dp"
-            android:lineSpacingExtra="0dp"/>
+            android:textSize="16sp" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

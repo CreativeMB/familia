@@ -23,14 +23,16 @@ class UsuarioAdapter(private val usuarios: List<Usuario>) :
         holder.nombreText.text = u.nombre
 //        holder.correoText.text = u.correo
 
-        val mesActual = obtenerMesActualConAnio()  // Obtener el mes y año actual
-        val cuotaDelMes = u.cuotas[mesActual] // Buscar la cuota para el mes actual
+        val mesActual = obtenerMesActualConAnio()  // Ej: "abril_2025"
+        val nombreMesSolo = mesActual.split("_")[0]  // Extrae solo "abril"
+
+        val cuotaDelMes = u.cuotas[mesActual]  // Busca en el mapa usando "abril_2025"
 
         if (cuotaDelMes != null) {
-            holder.cuotaText.text = "$mesActual: $$cuotaDelMes"
+            holder.cuotaText.text = "$nombreMesSolo: $$cuotaDelMes"
             holder.cuotaText.setTextColor(holder.itemView.context.getColor(android.R.color.holo_green_dark))
         } else {
-            holder.cuotaText.text = "$mesActual: Sin Aporte"
+            holder.cuotaText.text = "$nombreMesSolo: Sin Aporte"
             holder.cuotaText.setTextColor(holder.itemView.context.getColor(android.R.color.holo_red_dark))
         }
     }

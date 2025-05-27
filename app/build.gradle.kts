@@ -19,6 +19,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -28,6 +29,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -61,6 +63,5 @@ dependencies {
     // Google Identity Services (One Tap)
     implementation ("com.google.firebase:firebase-auth:23.2.0")
     implementation ("com.google.android.gms:play-services-auth:21.0.0")
-
 
 }
