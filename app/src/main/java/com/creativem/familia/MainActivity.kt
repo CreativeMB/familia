@@ -9,6 +9,7 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.activity.enableEdgeToEdge
@@ -35,6 +36,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerGastos: RecyclerView
     private lateinit var gastosAdapter: GastoAdapter
     private var listaGastos: List<Gasto> = listOf()
+    private var mesInicioGlobal: String = "sin datos"
+    private var mesFinalGlobal: String = "sin datos"
+
 
 
     private val correoAdministrador = "luzcelyrg@gmail.com"
@@ -95,11 +99,14 @@ class MainActivity : AppCompatActivity() {
             exportarPDF()
         }
 
+
     }
 
     private fun cargarUsuarios() {
         firebaseHelper.getUsuariosRef().addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+
+
                 listaUsuarios.clear()
                 for (ds in snapshot.children) {
                     val uid = ds.key ?: continue
@@ -109,16 +116,45 @@ class MainActivity : AppCompatActivity() {
                     val cuotas = mutableMapOf<String, Int>()
                     for (cuotaSnapshot in ds.children) {
                         val key = cuotaSnapshot.key ?: continue
-                        if (key.contains("_")) {
+                        if (key.matches(Regex("^[a-zA-Z]+_\\d{4}$"))) {
                             val valor = cuotaSnapshot.getValue(Int::class.java)
                             if (valor != null) {
                                 cuotas[key] = valor
                             }
                         }
                     }
+
+                    // Reunir todas las claves "mes_año" de todos los usuarios
+                    val todasLasFechas = listaUsuarios
+                        .flatMap { it.cuotas.keys } // obtener todas las claves de cuotas
+                        .distinct()
+                        .sortedWith { a, b ->
+                            val (mesA, anioA) = a.split("_")
+                            val (mesB, anioB) = b.split("_")
+
+                            val mesesOrden = listOf(
+                                "enero", "febrero", "marzo", "abril", "mayo", "junio",
+                                "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+                            )
+
+                            val indexA = mesesOrden.indexOf(mesA.lowercase())
+                            val indexB = mesesOrden.indexOf(mesB.lowercase())
+
+                            val anioIntA = anioA.toIntOrNull() ?: 0
+                            val anioIntB = anioB.toIntOrNull() ?: 0
+
+                            if (anioIntA != anioIntB) anioIntA - anioIntB else indexA - indexB
+                        }
+
+// Guardar como variables globales o usar directamente
+                    mesInicioGlobal = todasLasFechas.firstOrNull()?.replace("_", " ") ?: "sin datos"
+                    mesFinalGlobal = todasLasFechas.lastOrNull()?.replace("_", " ") ?: "sin datos"
+
+
                     val usuario = Usuario(uid = uid, nombre = nombre, correo = correo, cuotas = cuotas)
                     listaUsuarios.add(usuario)
                 }
+
                 adapter = UsuarioAdapter(listaUsuarios)
                 recyclerView.adapter = adapter
 
@@ -367,15 +403,39 @@ class MainActivity : AppCompatActivity() {
 
         var y = margin
 
-        // --- Título ---
-        canvas.drawText("Reporte total, Recaudos y Gastos", margin, y, titlePaint)
-        y += 40f
+        val now = Date()
+        val dateFormatter = SimpleDateFormat("dd 'de' MMMM 'de' yyyy, HH:mm", Locale("es", "ES"))
+        val fechaHoraFormateada = dateFormatter.format(now)
+// --- Título principal centrado ---
+        val titulo = "Familia Riaño - Contabilidad"
+        val tituloX = (pageWidth - titlePaint.measureText(titulo)) / 2
+        canvas.drawText(titulo, tituloX, y, titlePaint)
+        y += 30f
 
-        // --- Tabla Usuarios ---
-        val colWidthsUsuarios = listOf(220f, 80f, 100f) // Usuario, Mes, Cuota
+// --- Fecha y hora centrado ---
+        val fechaTexto = "Generado el: $fechaHoraFormateada"
+        val fechaX = (pageWidth - paint.measureText(fechaTexto)) / 2
+        canvas.drawText(fechaTexto, fechaX, y, paint)
+        y += 20f
+
+// --- Rango de meses centrado ---
+        val mesInicioFormateado = mesInicioGlobal.replaceFirstChar { it.uppercaseChar() }
+        val mesFinalFormateado = mesFinalGlobal.replaceFirstChar { it.uppercaseChar() }
+        val periodoTexto = "Periodo: desde $mesInicioFormateado hasta $mesFinalFormateado"
+        val periodoX = (pageWidth - paint.measureText(periodoTexto)) / 2
+        canvas.drawText(periodoTexto, periodoX, y, paint)
+        y += 30f
+
+        // --- Tabla Usuarios (ocupa todo el ancho respetando márgenes) ---
+        val anchoDisponible = pageWidth - 2 * margin
+        val colWidthUsuario = anchoDisponible * 0.5f    // 50%
+        val colWidthMes = anchoDisponible * 0.25f       // 25%
+        val colWidthCuota = anchoDisponible * 0.25f     // 25%
+
+        val colWidthsUsuarios = listOf(colWidthUsuario, colWidthMes, colWidthCuota)
         val xStartUsuarios = margin
 
-        // Cabecera tabla Usuarios
+// Cabecera tabla Usuarios
         var x = xStartUsuarios
         val headersUsuarios = listOf("Usuario", "Mes", "Cuota")
         for (i in headersUsuarios.indices) {
@@ -384,6 +444,7 @@ class MainActivity : AppCompatActivity() {
             x += colWidthsUsuarios[i]
         }
         y += rowHeight
+
 
         // Obtener meses únicos ordenados (alfabéticamente, adapta si necesitas orden cronológico)
         val todosLosMeses = listaUsuarios
@@ -404,7 +465,10 @@ class MainActivity : AppCompatActivity() {
             // Dibujar fila con el mes (columna 1)
             x = xStartUsuarios
             canvas.drawRect(x, y, x + colWidthsUsuarios[0] + colWidthsUsuarios[1] + colWidthsUsuarios[2], y + rowHeight, borderPaint)
-            canvas.drawText("Mes: $mes", x + 5f, y + 20f, titlePaint)
+            val mesFormateado = mes.replace("_", " ").replaceFirstChar { it.uppercaseChar() }
+            canvas.drawText("Mes: $mesFormateado", x + 5f, y + 20f, titlePaint)
+
+
             y += rowHeight
 
             for (usuario in listaUsuarios) {
@@ -423,10 +487,12 @@ class MainActivity : AppCompatActivity() {
                 canvas.drawText(usuario.nombre, x + 5f, y + 20f, paint)
                 x += colWidthsUsuarios[0]
 
-                // Columna Mes
+                // Columna Mes (formateado)
+                val mesFormateadoFila = mes.replace("_", " ").replaceFirstChar { it.uppercaseChar() }
+                canvas.drawText(mesFormateadoFila, x + 5f, y + 20f, paint)
                 canvas.drawRect(x, y, x + colWidthsUsuarios[1], y + rowHeight, borderPaint)
-                canvas.drawText(mes, x + 5f, y + 20f, paint)
                 x += colWidthsUsuarios[1]
+
 
                 // Columna Cuota
                 canvas.drawRect(x, y, x + colWidthsUsuarios[2], y + rowHeight, borderPaint)
@@ -439,12 +505,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         // --- Espacio antes tabla Gastos ---
-        y += 30f
+        y += 20f
 
-        // Tabla Gastos
-        val colWidthsGastos = listOf(220f, 100f, 100f)
+// --- Tabla Gastos (ocupa todo el ancho respetando márgenes) ---
+        val anchoDisponibleGastos = pageWidth - 2 * margin
+
+// Distribución de columnas: Detalle (50%), Valor (25%), Fecha (25%)
+        val colWidthDetalle = anchoDisponibleGastos * 0.5f
+        val colWidthValor = anchoDisponibleGastos * 0.25f
+        val colWidthFecha = anchoDisponibleGastos * 0.25f
+
+        val colWidthsGastos = listOf(colWidthDetalle, colWidthValor, colWidthFecha)
         val xStartGastos = margin
 
+// Si no cabe en la página actual, pasa a nueva página
         if (y + rowHeight > pageHeight - margin) {
             pdfDocument.finishPage(page)
             pageNumber++
@@ -454,8 +528,18 @@ class MainActivity : AppCompatActivity() {
             y = margin
         }
 
-        canvas.drawText("Gastos:", xStartGastos, y, titlePaint)
+// --- Título "Gastos" centrado y con cuadro ---
+        val tituloGastos = "Gastos:"
+        val anchoTitulo = colWidthsGastos.sum() // igual al ancho total de la tabla
+        canvas.drawRect(xStartGastos, y, xStartGastos + anchoTitulo, y + rowHeight, borderPaint)
+
+// Centrar el texto dentro del recuadro
+        val textWidth = titlePaint.measureText(tituloGastos)
+        val centerX = xStartGastos + (anchoTitulo - textWidth) / 2
+        canvas.drawText(tituloGastos, centerX, y + 25f, titlePaint)
+
         y += rowHeight
+
 
         x = xStartGastos
         val headersGastos = listOf("Detalle", "Valor", "Fecha")
@@ -465,6 +549,8 @@ class MainActivity : AppCompatActivity() {
             x += colWidthsGastos[i]
         }
         y += rowHeight
+
+        val lineSpacing = 18f // Espaciado entre líneas ajustado
 
         if (listaGastos.isEmpty()) {
             if (y + rowHeight > pageHeight - margin) {
@@ -479,7 +565,16 @@ class MainActivity : AppCompatActivity() {
             y += rowHeight
         } else {
             for (gasto in listaGastos) {
-                if (y + rowHeight > pageHeight - margin) {
+                val detalle = gasto.detalle ?: "Sin detalle"
+                val valor = gasto.valor ?: 0
+                val fecha = gasto.fecha ?: ""
+
+                val wrappedDetalle = wrapText(detalle, paint, colWidthsGastos[0] - 10f)
+                val maxLines = wrappedDetalle.size
+                val rowHeightMultiline = lineSpacing * maxLines + 10f // altura total de la fila
+
+                // Salto de página si no cabe
+                if (y + rowHeightMultiline > pageHeight - margin) {
                     pdfDocument.finishPage(page)
                     pageNumber++
                     val newPageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
@@ -489,24 +584,30 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 x = xStartGastos
-                val detalle = gasto.detalle ?: "Sin detalle"
-                val valor = gasto.valor ?: 0
-                val fecha = gasto.fecha ?: ""
 
-                canvas.drawRect(x, y, x + colWidthsGastos[0], y + rowHeight, borderPaint)
-                canvas.drawText(detalle, x + 5f, y + 20f, paint)
+                // Columna Detalle
+                canvas.drawRect(x, y, x + colWidthsGastos[0], y + rowHeightMultiline, borderPaint)
+                var textY = y + 20f
+                for (line in wrappedDetalle) {
+                    canvas.drawText(line, x + 5f, textY, paint)
+                    textY += lineSpacing
+                }
                 x += colWidthsGastos[0]
 
-                canvas.drawRect(x, y, x + colWidthsGastos[1], y + rowHeight, borderPaint)
+                // Columna Valor
+                canvas.drawRect(x, y, x + colWidthsGastos[1], y + rowHeightMultiline, borderPaint)
                 canvas.drawText(valor.toString(), x + 5f, y + 20f, paint)
                 x += colWidthsGastos[1]
 
-                canvas.drawRect(x, y, x + colWidthsGastos[2], y + rowHeight, borderPaint)
+                // Columna Fecha
+                canvas.drawRect(x, y, x + colWidthsGastos[2], y + rowHeightMultiline, borderPaint)
                 canvas.drawText(fecha, x + 5f, y + 20f, paint)
 
-                y += rowHeight
+                y += rowHeightMultiline
             }
-            // --- Espacio antes de totales ---
+
+
+        // --- Espacio antes de totales ---
             y += 40f
             if (y + rowHeight * 3 > pageHeight - margin) {
                 pdfDocument.finishPage(page)
@@ -517,25 +618,59 @@ class MainActivity : AppCompatActivity() {
                 y = margin
             }
 
-// --- Mostrar Totales ---
-            canvas.drawText("Totales Generales", margin, y, titlePaint)
-            y += rowHeight
+            // --- Mostrar Totales en una sola fila con fondo oscuro y texto blanco ---
 
-            canvas.drawText("Total Recaudos: $totalCuotas", margin, y, paint)
-            y += rowHeight
+// Estilo del fondo (gris oscuro)
+            val fondoPaint = Paint().apply {
+                style = Paint.Style.FILL
+                color = Color.rgb(50, 50, 50) // Fondo oscuro
+            }
 
-            canvas.drawText("Total Gastos: $totalGastos", margin, y, paint)
-            y += rowHeight
+// Estilo del texto blanco
+            val textoBlancoPaint = Paint().apply {
+                color = Color.WHITE
+                textSize = paint.textSize
+                typeface = paint.typeface
+                isAntiAlias = true
+            }
 
-            canvas.drawText("Saldo Final: $saldoFinal", margin, y, paint)
-            y += rowHeight
+            // Formateo de valores (opcional: con separador de miles)
+            fun formatear(valor: Int): String {
+                return "$" + String.format("%,d", valor).replace(",", ".")
+            }
+
+// Valores a mostrar
+            val valoresTotales = listOf(
+                "Aporte: ${formatear(totalCuotas)}",
+                "Gastos: ${formatear(totalGastos)}",
+                "Saldo: ${formatear(saldoFinal)}"
+            )
+
+// Calcular ancho disponible
+            val anchoDisponible = pageWidth - 2 * margin
+            val colWidth = anchoDisponible / 3
+            val colWidthsTotales = listOf(colWidth, colWidth, colWidth)
+
+// Dibujar la fila
+            var x = margin
+            for (i in valoresTotales.indices) {
+                canvas.drawRect(x, y, x + colWidthsTotales[i], y + rowHeight, fondoPaint)
+                canvas.drawText(valoresTotales[i], x + 10f, y + 25f, textoBlancoPaint)
+                x += colWidthsTotales[i]
+            }
+            y += rowHeight + 10f
+
+
         }
 
         // Finaliza la última página
         pdfDocument.finishPage(page)
 
         // Guardar y compartir (usa tu método de preferencia)
-        val fileName = "Reporte${System.currentTimeMillis()}.pdf"
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm", Locale.getDefault())
+        val formattedDate = dateFormat.format(Date())
+        val fileName = "Familia Riaño_$formattedDate.pdf"
+
         val file = File(cacheDir, fileName)
 
         try {
@@ -556,7 +691,27 @@ class MainActivity : AppCompatActivity() {
             pdfDocument.close()
         }
     }
+fun wrapText(text: String, paint: Paint, maxWidth: Float): List<String> {
+    val words = text.split(" ")
+    val lines = mutableListOf<String>()
+    var currentLine = ""
 
+    for (word in words) {
+        val testLine = if (currentLine.isEmpty()) word else "$currentLine $word"
+        if (paint.measureText(testLine) <= maxWidth) {
+            currentLine = testLine
+        } else {
+            lines.add(currentLine)
+            currentLine = word
+        }
+    }
+
+    if (currentLine.isNotEmpty()) {
+        lines.add(currentLine)
+    }
+
+    return lines
+}
 
 
 }
