@@ -7,7 +7,8 @@
     <color name="sky_blue">#81D4FA</color>         <!-- Azul cielo, tranquilidad y optimismo -->
     <color name="mint_green">#A5D6A7</color>       <!-- Verde menta, frescura y esperanza -->
     <color name="lavender">#7E7E7E</color>         <!-- Lavanda, calma y dulzura -->
-
+    <color name="secundario">#000000</color>         <!-- Azul cielo, tranquilidad y optimismo -->
+    <color name="principal">#FFFFFF</color>
     <!-- Neutros suaves para balance -->
     <color name="warm_white">#FFFDE7</color>       <!-- Blanco cálido para fondos -->
     <color name="rich_brown">#6D4C41</color>       <!-- Marrón elegante para texto -->

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@color/lavender">
+    android:background="@color/principal">
 
     <!-- Contenedor principal vertical -->
     <LinearLayout
@@ -18,7 +18,7 @@
             android:id="@+id/recyclerViewUsuarios"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/lavender"
+            android:background="@color/principal"
             tools:listitem="@layout/item_usuario" />
 
         <!-- Totales -->
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="4dp"
-            android:background="#C3085049">
+            android:background="@color/lavender">
 
             <TextView
                 android:id="@+id/textTituloTotales"
@@ -88,7 +88,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@color/lavender"
+            android:background="@color/principal"
             tools:listitem="@layout/item_gasto" />
     </LinearLayout>
 
